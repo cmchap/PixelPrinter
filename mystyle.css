@@ -1,0 +1,70 @@
+#editor {
+	width: 0%;
+}
+
+#parametersdiv {
+	bottom: 4em;
+}
+
+#filedropzone {
+	display: none;
+}
+
+#color-simpliier * {
+	all: unset;
+}
+
+#color-simplifier {
+	all: unset;
+	position: absolute;
+	z-index: 99999;
+	padding: 1em;
+	margin: 0;
+	top:    0;
+	bottom: 0;
+	right:  0;
+	background-color: white;
+	overflow: scroll;
+}
+
+#color-simplifier .copied {
+	display: inline;
+}
+
+#color-simplifier #current-color {
+	margin-bottom: 1em;
+}
+
+#color-simplifier #simplify-colors-button {
+	display: inline-block;
+	/*margin-left: 5em;*/
+}
+
+#color-simplifier #saved-color-list {
+    counter-reset: rowNumber;
+}
+
+#color-simplifier .saved-color:before {
+	counter-increment: rowNumber;
+	content: counter(rowNumber);
+}
+
+#color-simplifier .saved-color {
+    height: 1.5em;
+    border: 1px solid red;
+}
+
+#color-simplifier #saved-color-list tr td {
+	margin: 0.5em;
+}
+
+#color-simplifier .color-swatch {
+    display: inline-block;
+    width: 3em;
+    height: 1em;
+    border: 1px solid black;
+}
+
+#color-simplifier .remove {
+	margin-left: 1em;
+}
