@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+</head>
+<body>
+<h1 id="instructions:">Instructions:</h1>
+
+<p>1) Select or upload an image. Icon-sized images (50px x 50px or less) work best, since larger images take longer to generate the model.
+2) Click on the colors in your image that you want the PixelPrinter to keep. It will convert any the other colors in the image to the colors you select.
+3) Generate the model.
+4) Play with the parameters on the left to customize your model. Click Update to regenerate the model with the new parameters. Click and drag to rotate the model. Shift+click and drag to pan.
+5) Generate and download your STL.
+6) 3D Print your model.
+7) Profit.</p>
+
+<h1 id="parameters">Parameters</h1>
+
+<ul>
+<li><code>Model</code> &#8211; Preconfigured models you can select to see how the tool works. This will be overwritten by <code>New Bitmap Array</code>.</li>
+<li><code>Additional Thickness (mm)</code> &#8211; Adds a backing of the specified size. This is useful if you want your model to stand upright, instead of lay flat after you&#8217;ve 3D printed it. Unit: millimeters</li>
+<li><code>Pixel size (mm)</code> &#8211; The X and Y dimension of the cube used to represent each pixel in the image. Unit: millimeters</li>
+<li><code>Invert Heights</code> &#8211; By default, the dark pixels are tallest, and the light pixels are shortest. This setting inverts those heights.</li>
+<li><code>Multiplier</code> &#8211; This controls the ratio of pixel heights (in the Z axis) among the different pixels. For instance, if <code>Ones</code> = 1, <code>Twos</code> = 2, and <code>Multiplier</code> = 1, then the Ones pixels will be 1 unit tall and the Twos pixels will be 2 units tall. If we change <code>Multiplier</code> to 2, the Ones pixels will be 2 units tall (1<em>2), and the Twos pixels will be 4 units tall (2</em>2).</li>
+<li><code>Zeros</code> &#8211; For development testing only. Hopefully, this doesn&#8217;t do anything for you.</li>
+<li><code>Ones</code>, <code>Twos</code>, <code>Threes</code>, etc. &#8211; The height of the pixels that were created by each color. Ones are the lightest color, Twos are the second-lightest color, etc. Units: millimeters</li>
+<li><code>New Bitmap Array</code> &#8211; An array of arrays representing the image-generated model before the other parameters are applied. Each sub-array represents a row of pixels in the image. Each value in the sub-arrays represents the height of that pixel in the model before the other parameters are applied.</li>
+<li><code>Update</code> &#8211; Updates the model with the selected parameters.</li>
+<li><code>Instand Update</code> &#8211; Updates the model as soon as a changed-parameter looses focus. This is useufl for small models, but models larger than 30px square may take too long to render to make this useful.</li>
+</ul>
+
+<h1 id="credits">Credits</h1>
+
+<p>Thanks to <a href="https://github.com/joostn/OpenJsCad">joostn&#8217;s OpenJSCad</a> and <a href="https://github.com/Spiritdude/OpenJSCAD.org">SpiritDude&#8217;s OpenJSCad.org</a></p>
+
+<h1 id="license">License</h1>
+
+<p>Copyright (c) 2015 Cory Chapman (@cmchap), under the MIT license.</p>
+
+</body>
+</html>

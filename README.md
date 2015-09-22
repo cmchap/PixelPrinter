@@ -1,118 +1,27 @@
-<img src="doc/logo.png" width=256 align=right>
-<h1>OpenJSCAD.org</h1>
+# Instructions:
+1) Select or upload an image. Icon-sized images (50px x 50px or less) work best, since larger images take longer to generate the model.
+2) Click on the colors in your image that you want the PixelPrinter to keep. It will convert any the other colors in the image to the colors you select.
+3) Generate the model. 
+4) Play with the parameters on the left to customize your model. Click Update to regenerate the model with the new parameters. Click and drag to rotate the model. Shift+click and drag to pan. 
+5) Generate and download your STL.
+6) 3D Print your model.
+7) Profit.
 
-<b>Version 0.3.0</b> (ALPHA)
+# Parameters
+* `Model` -- Preconfigured models you can select to see how the tool works. This will be overwritten by `New Bitmap Array`.
+* `Additional Thickness (mm)` -- Adds a backing of the specified size. This is useful if you want your model to stand upright, instead of lay flat after you've 3D printed it. Unit: millimeters
+* `Pixel size (mm)` -- The X and Y dimension of the cube used to represent each pixel in the image. Unit: millimeters
+* `Invert Heights` -- By default, the dark pixels are tallest, and the light pixels are shortest. This setting inverts those heights. 
+* `Multiplier` -- This controls the ratio of pixel heights (in the Z axis) among the different pixels. For instance, if `Ones` = 1, `Twos` = 2, and `Multiplier` = 1, then the Ones pixels will be 1 unit tall and the Twos pixels will be 2 units tall. If we change `Multiplier` to 2, the Ones pixels will be 2 units tall (1*2), and the Twos pixels will be 4 units tall (2*2).
+* `Zeros` -- For development testing only. Hopefully, this doesn't do anything for you.
+* `Ones`, `Twos`, `Threes`, etc. -- The height of the pixels that were created by each color. Ones are the lightest color, Twos are the second-lightest color, etc. Units: millimeters
+* `New Bitmap Array` -- An array of arrays representing the image-generated model before the other parameters are applied. Each sub-array represents a row of pixels in the image. Each value in the sub-arrays represents the height of that pixel in the model before the other parameters are applied. 
+* `Update` -- Updates the model with the selected parameters. 
+* `Instand Update` -- Updates the model as soon as a changed-parameter looses focus. This is useufl for small models, but models larger than 30px square may take too long to render to make this useful. 
 
-<b>OpenJSCAD.org</b> is a more up-to-date <a href="http://joostn.github.com/OpenJsCad/">OpenJsCAD</a> frontend where you can edit .jscad files either locally or online via JS editor (built-in).
-A few functions are available to make the transition from <a href="http://openscad.org/">OpenSCAD</a> to OpenJSCAD easier (<a href="https://github.com/Spiritdude/OpenSCAD.jscad">OpenSCAD.jscad</a> built-in),
-as well CLI (command-line interface) for server-side computations with NodeJS.
+# Credits
+Thanks to [joostn's OpenJSCad](https://github.com/joostn/OpenJsCad) and [SpiritDude's OpenJSCad.org](https://github.com/Spiritdude/OpenJSCAD.org)
 
-<h2>Installation</h2>
+# License
+Copyright (c) 2015 Cory Chapman (@cmchap), under the MIT license.
 
-<b>Immediate Use</b>: No installation, go to <b><a href="http://openjscad.org">OpenJSCAD.org</a></b> (Google Chrome, Firefox)
-
-<b>Local Web Use:</b>
-<pre>
-% git clone https://github.com/Spiritdude/OpenJSCAD.org
-% cd OpenJSCAD.org
-% make install
-</pre>
-
-and then access the files via local web-site and your web-browser. 
-
-<b>Local CLI Use:</b>
-
-For CLI (command-line interface) rendering install <a href="http://nodejs.org/">NodeJS</a> as well, e.g. <tt>apt-get install nodejs</tt> (be aware <b>NodeJS &gt; 0.8.1 or newer is required</b>) and then test it:
-<pre>
-% cd examples/
-% openjscad example005.jscad                         # -- creates example005.stl as default
-% openjscad example001.jscad -o test.stl
-% openjscad example001.scad -o example001scad.jscad  # -- convert .scad into .jscad
-% openjscad frog.stl -o test.jscad                   # -- convert .stl into .jscad
-% openjscad logo.jscad -of amf                       # -- convert logo.jscad into logo.amf
-</pre>
-
-<b>Note:</b> on some systems the NodeJS executable is <tt>node</tt> (default) or <tt>nodejs</tt>, edit <tt>openjscad</tt> first line to reflect this.
-
-<h2>History</h2>
-<ul>
-<li>2015/07/02: 0.3.0: format.js (Stefan Baumann), and Blob.js/openjscad improved by Z3 Dev
-<li>2015/05/20: 0.2.4: renumbering, latest csg.js from http://joostn.github.com/OpenJsCad/ adapted
-<li>2015/04/08: 0.024: dev branch opened
-<li>2015/02/14: 0.023: bumping version based on openscad.js
-<li>2015/02/04; 0.020: browser window resizing done properly, thanks to Z3 devs via pull request
-<li>2015/01/07: 0.019: various pull requests from github merged again
-<li>2014/10/05: 0.018: various pull requests from github merged
-<li>2013/04/11: 0.017: alpha channel supported in color() and .setColor()
-<li>2013/04/07: 0.016: csg.js: solidFromSlices() and .setColor() on polygon level, and examples by Eduard Bespalov
-<li>2013/04/05: 0.015: rudimentary AMF export and import, web and cli
-<li>2013/04/03: 0.014: multiple files via drag & drop, developing locally
-<li>2013/04/01: 0.013: include() on web-online & drag & drop (but not off-line) and cli (server-side)
-<li>2013/03/20: 0.012: improved UI (slider from the left)
-<li>2013/03/28: 0.011: added support for rectangular_extrude(), rotate_extrude() and torus()
-<li>2013/03/22: 0.010: leave .scad file intact, and translate on-the-fly
-<li>2013/03/20: 0.009: OpenSCAD .scad syntax support included via <a href="https://github.com/garyhodgson/openscad-openjscad-translator">openscad-openjscad-translator</a> module, on web and cli; and experimental .stl import support (binary & ascii)
-<li>2013/03/15: 0.008: circle(), square(), polygon() partially and linear_extrude() implemented (openscad-like)
-<li>2013/03/14: 0.007: integrating jQuery for new features; draggable hint window
-<li>2013/03/12: 0.006: included examples available in the web-frontend direct
-<li>2013/03/12: 0.005: supporting webgui parameters as of original OpenJsCad (see examples/example030.jscad)
-<li>2013/03/11: 0.004: openscad.js: many improvements, more OpenSCAD-like functions
-<li>2013/03/10: 0.003: solidify the functionality (few bug fixes)
-<li>2013/03/10: 0.001: initial version
-</ul>
-
-See for more details <a href="https://plus.google.com/115007999023701819645">G+ OpenJSCAD.org Announcements</a> and
-<a href="https://plus.google.com/communities/114958480887231067224">G+ OpenJSCAD Community</a> to discuss with other user and developers.
-
-<h2>Todo</h2>
-<ul>
-<li> <del>3d primitive: <b>torus()</b></del> (done)
-<li> <del>OpenSCAD .scad support for both Web-GUI and CLI</del> (done)
-<li> <del><b>include()</b> for Web-GUI and CLI to include libraries and modules, support of multiple .jscad drag & drop with include()</del> (done) 
-<li> save from built-in editor to local
-<li> <del>complete 2D primitives and transformations</del> (done)
-<li> <del>implementation of <b>linear_extrude()</b> <b>rotate_extrude()</b>, parameter compatible to OpenSCAD</del> (done)
-<li> <del>example of platonic solids (in progress, requires include())</del> (done)
-<li> <del>simple 2D/3D text</del> (done)
-<li> <del>2d operation: hull()</del> (done)
-<li> processing/progress bar (0..100%), perhaps even visual progress seen in the model direct
-<li> <del>STL importer</del> (done) & AMF importer / exporter
-<li> integration into <a href="https://github.com/Spiritdude/RepRapCloud">RepRap Cloud</a> as first stage of the workflow
-</ul>
-
-<h2>Documentation</h2>
-<ul>
-<li><b><a href="https://github.com/Spiritdude/OpenJSCAD.org/wiki/User-Guide">OpenJSCAD User & Programming Guide</a></b>
-</ul>
-
-<h2>Screenshots</h2>
-
-Simple JSCAD example (example000.jscad):
-<img src="doc/sshot-01.png">
-
-More sophisticated JSCAD example, fully object-oriented (OO) programmed with interactive parameters (example031.jscad):
-<img src="doc/sshot-03-illu.png">
-
-Import of STL models:
-<img src="doc/sshot-04.png">
-
-Drag & drop a local file:
-<img src="doc/sshot-05-illu.png">
-
-Drag & drop multiple files (Chrome & Firefox) or a folder (Chrome):
-<img src="doc/sshot-06-illu.png">
-
-<h2>See Also</h2>
-<ul>
-<li><a href="http://joostn.github.com/OpenJsCad/">OpenJsCAD</a>, starting point of OpenJSCAD.org
-<li><a href="http://garyhodgson.github.com/openscad.net/">OpenSCAD.net</a>, another place of inspiration, where the OpenSCAD translator was adapted from
-<li><a href="http://kaosat-dev.github.com/CoffeeSCad/">CoffeeSCad</a>, JavaScript simplified (no more {}), very active development
-<li><a href="http://rsmith.home.xs4all.nl/software/py-stl-stl2pov.html">stl2pov</a> tool to convert .stl to .pov, and then render via <a href="http://povray.org">PovRay.org</a>
-<li><a href="https://github.com/D1plo1d/p3d">P3D</a> STL/AMF/OBJ viewer
-</ul>
-
-
-That's all for now,
-
-Rene K. Mueller<br>
-initial version 2013/03/10, updated 2013/04/04
