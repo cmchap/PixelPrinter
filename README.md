@@ -1,6 +1,6 @@
 # Instructions:
 1) Select or upload an image. Icon-sized images (50px x 50px or less) work best, since larger images take longer to generate the model.
-2) Click on the colors in your image that you want the PixelPrinter to keep. It will convert any the other colors in the image to the colors you select.
+2) Click on the colors in your image that you want the PixelPrinter to keep. It will convert any the other colors in the image to the colors you select. Scroll up/down while your mosue is over the original image to zoom in/out.
 3) Generate the model. 
 4) Play with the parameters on the left to customize your model. Click Update to regenerate the model with the new parameters. Click and drag to rotate the model. Shift+click and drag to pan. 
 5) Generate and download your STL.
@@ -25,3 +25,8 @@ Thanks to [joostn's OpenJSCad](https://github.com/joostn/OpenJsCad) and [SpiritD
 # License
 Copyright (c) 2015 Cory Chapman (@cmchap), under the MIT license.
 
+# TODO
+* Change all the links that currently point to OpenJSCAD.org's github repo to point to this repo.
+* Write instructions for folks who go straight to the tool wihtout reading this README file
+* Re-enable zooming on the simplified image
+* Make the original and simplified images larger, so it's easier to mouse over them while selecting colors. 
