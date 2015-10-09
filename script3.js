@@ -2,7 +2,6 @@
  * Variables
  */
 
-var test = 'this is a test variable';
 var selector = $('#selector');
 var sourceimage = new Image();
 
@@ -666,12 +665,12 @@ scanvas.mousemove( function(e) {
 });
 
 $('#create-simplified').click( function() {
-	$('td:contains("New Bitmap Array").caption').next().children('input').val(generateArray(simplifiedImageData, greyscalesavedcolors, scanvas[0]));
+	$('.parameterstable td.caption:contains("New Bitmap Array")').next().children('input').val(generateArray(simplifiedImageData, greyscalesavedcolors, scanvas[0]));
 	$('.parameterstable').next('button:contains("Update")').trigger('click');
 });
 
 $('#create-original').click( function() {
-	$('td:contains("New Bitmap Array").caption').next().children('input').val(generateArrayOriginal(originalImageData, canvas[0]));
+	$('.parameterstable td.caption:contains("New Bitmap Array")').next().children('input').val(generateArrayOriginal(originalImageData, canvas[0]));
 	$('.parameterstable').next('button:contains("Update")').trigger('click');
 
 });

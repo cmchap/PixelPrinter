@@ -1,22 +1,21 @@
-function unionize(o) {
- 	var p = cube({size: [0,0,0]});
-	o.forEach(function (value, i) {
-		p = union(p, value);
-	});
-	return p;
-}
-
-function eightBit(bitmap, block_size) {
+function eightBit(bitmap, block_size, color_array) {
 	var o = [];
+	var number_of_rows = bitmap.length;
+	var number_of_columns = bitmap[0].length;
 	bitmap.forEach(function (row, rowCounter) {
 		row.forEach(function (pixel, columnCounter) {
 			if (pixel !== 0){
 				o.push(cube({size: [block_size, block_size, pixel*block_size]})
-					.translate([columnCounter*block_size*-1, rowCounter*block_size, 0]));
+					.translate([columnCounter*block_size, rowCounter*block_size*-1, 0])
+					.translate([number_of_columns/-2*block_size, number_of_rows/2*block_size, 0]) //center
+				    .setColor(color_array)
+				);
 			}
 		});
 	});
-	// return unionize(o);
+	
+// 	o = union(o);
+	
 	return o;
 }
 
@@ -84,11 +83,6 @@ function invertBitmap(bitmap) {
 			arr[columnCounter] = maxvalue - pixel + 1;
 		});
 	});
-	// for (var i = 0; i < bitmap.length; i++) {
-	// 	for (var j = 0; j < i.length; j++) {
-	// 		bitmap[row][pixel] = max - pixel + 1;
-	// 	}
-	// }
 	return bitmap;
 }
 
@@ -196,12 +190,18 @@ function getParameterDefinitions() {
 			initial: "",
 			type: 'text',
 			caption: 'New Bitmap Array'
+		},
+		{
+		    name: 'color',
+		    default: [0.968627451, 0.28627451, 0.007843137],
+		    type: 'color',
+		    caption: 'Color'
 		}
 	];
 }
 
 function main(params) {
-	var bitmap = []
+	var bitmap = [];
 	switch (params.model) {
 		case "RUNMAR":
 			bitmap = [
@@ -390,7 +390,6 @@ function main(params) {
 		bitmap = thicken(bitmap, params.thickness);
 	}
 
-
-	return scale([params.size_of_block, params.size_of_block, 1], eightBit(bitmap, 1)).setColor([247/255, 73/255, 2/255]);
+	// return scale([params.size_of_block, params.size_of_block, 1], eightBit(bitmap, 1)).setColor([.968627451, .28627451, .007843137]);
+	return eightBit(bitmap, 1, params.color);
 }
-

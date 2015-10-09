@@ -28,11 +28,11 @@ OpenJsCad.log = function(txt) {
 OpenJsCad.Viewer = function(containerelement, initialdepth) {
   var gl = GL.create();
   this.gl = gl;
-  this.angleX = -30;
+  this.angleX = -60;
   this.angleY = 0;
-  this.angleZ = 180;
-  this.viewpointX = -5;
-  this.viewpointY = -10;
+  this.angleZ = -45;
+  this.viewpointX = 0;
+  this.viewpointY = -5;
   this.viewpointZ = initialdepth;
 
   this.touch = {
@@ -101,7 +101,7 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
       void main() {\
         vec3 n = normalize(normal);\
         float diffuse = max(0.0, dot(light, n));\
-        float specular = pow(max(0.0, -reflect(light, n).z), 10.0) * sqrt(diffuse)*0.1;\
+        float specular = pow(max(0.0, -reflect(light, n).z), 10.0) * sqrt(diffuse);\
         gl_FragColor = vec4(mix(color * (0.3 + 0.7 * diffuse), vec3(1.0), specular), alpha);\
       }'
   );
@@ -161,7 +161,7 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
             shiftControl.removeClass('active shift-horizontal shift-vertical');
         }
     }).on("transformend dragstart dragend", function(e) {
-      if ((e.type == 'transformend' && _this.touch.cur == 'transforming') ||
+      if ((e.type == 'transformend' && _this.touch.cur == 'transforming') || 
           (e.type == 'dragend' && _this.touch.cur == 'shifting') ||
           (e.type == 'dragend' && _this.touch.cur == 'dragging'))
         _this.touch.cur = null;
@@ -197,12 +197,12 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
   window.addEventListener( 'resize', this.gl.resizeCanvas );
 
   this.gl.onmousewheel = function(e) {
-    var wheelDelta = 0;
+    var wheelDelta = 0;    
     if (e.wheelDelta) {
       wheelDelta = e.wheelDelta;
     } else if (e.detail) {
       // for firefox, see http://stackoverflow.com/questions/8886281/event-wheeldelta-returns-undefined
-      wheelDelta = e.detail * -40;
+      wheelDelta = e.detail * -40;     
     }
     if(wheelDelta) {
       var factor = Math.pow(1.003, -wheelDelta);
@@ -223,13 +223,13 @@ OpenJsCad.Viewer.prototype = {
     } else {
        this.meshes = OpenJsCad.Viewer.csgToMeshes(csg);
     }
-    this.onDraw();
+    this.onDraw();    
   },
 
   clear: function() {
     // empty mesh list:
-    this.meshes = [];
-    this.onDraw();
+    this.meshes = []; 
+    this.onDraw();    
   },
 
   supported: function() {
@@ -260,7 +260,7 @@ OpenJsCad.Viewer.prototype = {
     var coeff = (this.viewpointZ-this.ZOOM_MIN) / (this.ZOOM_MAX - this.ZOOM_MIN);
     return coeff;
   },
-
+  
   onMouseMove: function(e) {
     if (e.dragging) {
       //console.log(e.which,e.button);
@@ -328,7 +328,7 @@ OpenJsCad.Viewer.prototype = {
         delta = e.gesture.deltaY - this.touch.lastY;
         this.viewpointY -= factor * delta * this.viewpointZ;
         this.angleX += delta;
-    }
+    } 
     if (this.touch.lastX && (e.gesture.direction == 'left' || e.gesture.direction == 'right')) {
         this.touch.shiftControl
           .removeClass('shift-vertical')
@@ -416,7 +416,7 @@ OpenJsCad.Viewer.prototype = {
          gl.color(1, 0.5, 0.5, 0.2); //negative direction is lighter
          gl.vertex(-100, 0, 0);
          gl.vertex(0, 0, 0);
-
+   
          gl.color(1, 0, 0, 0.8); //positive direction
          gl.vertex(0, 0, 0);
          gl.vertex(100, 0, 0);
@@ -424,7 +424,7 @@ OpenJsCad.Viewer.prototype = {
          gl.color(0.5, 1, 0.5, 0.2); //negative direction is lighter
          gl.vertex(0, -100, 0);
          gl.vertex(0, 0, 0);
-
+   
          gl.color(0, 1, 0, 0.8); //positive direction
          gl.vertex(0, 0, 0);
          gl.vertex(0, 100, 0);
@@ -432,7 +432,7 @@ OpenJsCad.Viewer.prototype = {
          gl.color(0.5, 0.5, 0.5, 0.2); //negative direction is lighter
          gl.vertex(0, 0, -100);
          gl.vertex(0, 0, 0);
-
+   
          gl.color(0.2, 0.2, 0.2, 0.8); //positive direction
          gl.vertex(0, 0, 0);
          gl.vertex(0, 0, 100);
@@ -485,8 +485,8 @@ OpenJsCad.Viewer.csgToMeshes = function(initial_csg) {
       color = polygon.color;
     }
 
-	if (color.length < 4)
-		color.push(1.); //opaque
+  if (color.length < 4)
+    color.push(1.); //opaque
 
     var indices = polygon.vertices.map(function(vertex) {
       var vertextag = vertex.getTag();
@@ -506,7 +506,7 @@ OpenJsCad.Viewer.csgToMeshes = function(initial_csg) {
     }
     // if too many vertices, start a new mesh;
     if (vertices.length > 65000) {
-      // finalize the old mesh
+      // finalize the old mesh  
       mesh.triangles = triangles;
       mesh.vertices = vertices;
       mesh.colors = colors;
@@ -557,7 +557,7 @@ OpenJsCad.makeAbsoluteUrl = function(url, baseurl) {
       } else {
         comps2.push(c);
       }
-    });
+    });  
     url = "";
     for(var i = 0; i < comps2.length; i++) {
       if(i > 0) url += "/";
@@ -576,7 +576,7 @@ OpenJsCad.isChrome = function() {
 OpenJsCad.runMainInWorker = function(mainParameters) {
   try {
     if(typeof(main) != 'function') throw new Error('Your jscad file should contain a function main() which returns a CSG solid or a CAG area.');
-    OpenJsCad.log.prevLogTime = Date.now();
+    OpenJsCad.log.prevLogTime = Date.now();    
     var result = main(mainParameters);
     if( (typeof(result) != "object") || ((!(result instanceof CSG)) && (!(result instanceof CAG)))) {
       //throw new Error("Your main() function should return a CSG solid or a CAG area.");
@@ -594,8 +594,8 @@ OpenJsCad.runMainInWorker = function(mainParameters) {
           o = o.unionForNonIntersecting(c);
        }
        result = o;
-    }
-    var result_compact = result.toCompactBinary();
+    } 
+    var result_compact = result.toCompactBinary();   
     result = null; // not needed anymore
     self.postMessage({cmd: 'rendered', result: result_compact});
   }
@@ -603,7 +603,7 @@ OpenJsCad.runMainInWorker = function(mainParameters) {
     var errtxt = e.toString();
     if(e.stack) {
       errtxt += '\nStack trace:\n'+e.stack;
-    }
+    } 
     self.postMessage({cmd: 'error', err: errtxt});
   }
 };
@@ -618,12 +618,12 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
     workerscript += "F8  continues running\nPress the (||) button at the bottom to enable pausing whenever an error occurs\n";
     workerscript += "Click on a line number to set or clear a breakpoint\n";
     workerscript += "For more information see: http://code.google.com/chrome/devtools/docs/overview.html\n\n";
-    workerscript += "------------------------------------------------------------------------- */\n";
+    workerscript += "------------------------------------------------------------------------- */\n"; 
     workerscript += "\n\n// Now press F11 twice to enter your main() function:\n\n";
     workerscript += "debugger;\n";
   }
   workerscript += "var me = " + JSON.stringify(me) + ";\n";
-  workerscript += "return main("+JSON.stringify(mainParameters)+");";
+  workerscript += "return main("+JSON.stringify(mainParameters)+");";  
 // trying to get include() somewhere:
 // 1) XHR works for SYNC <---
 // 2) importScripts() does not work in SYNC
@@ -638,7 +638,7 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
     if(index!=-1) {\
        url = url.substring(0,index);\
     }\
-  	 importScripts(url+fn);\
+     importScripts(url+fn);\
   } else {\
    console.log('SYNC checking gMemFs for '+fn);\
    if(gMemFs[fn]) {\
@@ -659,14 +659,14 @@ OpenJsCad.parseJsCadScriptSync = function(script, mainParameters, debugging) {
 }\
 ";
   //workerscript += "function includePath(p) { _includePath = p; }\n";
-
+  
   if(0) {
-    OpenJsCad.log.prevLogTime = Date.now();
+    OpenJsCad.log.prevLogTime = Date.now();    
     return eval(workerscript);      // old fashion-way
 
   } else {
     var f = new Function(workerscript);
-    OpenJsCad.log.prevLogTime = Date.now();
+    OpenJsCad.log.prevLogTime = Date.now();    
     return f();                     // execute the actual code
   }
 };
@@ -682,12 +682,12 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   ];
 
   var baseurl = document.location.href.replace(/\?.*$/, '');
-  baseurl = baseurl.replace(/#.*$/,'');        // remove remote URL
+  baseurl = baseurl.replace(/#.*$/,'');        // remove remote URL 
   var openjscadurl = baseurl;
   if (options['openJsCadPath'] != null) {
     openjscadurl = OpenJsCad.makeAbsoluteUrl( options['openJsCadPath'], baseurl );
   }
-
+        
   var libraries = [];
   if (options['libraries'] != null) {
     libraries = options['libraries'];
@@ -711,9 +711,9 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   for(var fn in gMemFs) {
      workerscript += "// "+gMemFs[fn].name+":\n";
      //workerscript += gMemFs[i].source+"\n";
-     if(!mainFile)
+     if(!mainFile) 
         mainFile = fn;
-     if(fn=='main.jscad'||fn.match(/\/main.jscad$/))
+     if(fn=='main.jscad'||fn.match(/\/main.jscad$/)) 
         mainFile = fn;
      workerscript += "gMemFs[\""+gMemFs[fn].name+"\"] = "+JSON.stringify(gMemFs[fn].source)+";\n";
      ignoreInclude = true;
@@ -741,7 +741,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
 //  workerscript += "  catch(e) {var errtxt = e.stack; self.postMessage({cmd: 'error', err: errtxt});}";
   workerscript += "}},false);\n";
 
-// trying to get include() somewhere:
+// trying to get include() somewhere: 
 // 1) XHR fails: not allowed in blobs
 // 2) importScripts() works for ASYNC <----
 // 3) _csg_libraries.push(fn) provides only 1 level include()
@@ -759,7 +759,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
     if(index!=-1) {\
        url = url.substring(0,index);\
     }\
-  	 importScripts(url+fn);\
+     importScripts(url+fn);\
   } else {\
    var xhr = new XMLHttpRequest();\
    xhr.open('GET', _includePath+fn, true);\
@@ -778,12 +778,12 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   }
   //workerscript += "function includePath(p) { _includePath = p; }\n";
   var blobURL = OpenJsCad.textToBlobUrl(workerscript);
-
+  
   if(!window.Worker) throw new Error("Your browser doesn't support Web Workers. Please try the Chrome or Firefox browser instead.");
   var worker = new Worker(blobURL);
   worker.onmessage = function(e) {
     if(e.data)
-    {
+    { 
       if(e.data.cmd == 'rendered')
       {
         var resulttype = e.data.result.class;
@@ -832,7 +832,7 @@ OpenJsCad.textToBlobUrl = function(txt) {
   var windowURL=OpenJsCad.getWindowURL();
   var blob = new Blob([txt], { type : 'application/javascript' });
   var blobURL = windowURL.createObjectURL(blob);
-  if(!blobURL) throw new Error("createObjectURL() failed");
+  if(!blobURL) throw new Error("createObjectURL() failed"); 
   return blobURL;
 };
 
@@ -943,7 +943,7 @@ OpenJsCad.Processor.convertToSolid = function(obj) {
   } else if( (typeof(obj) == "object") && ((obj instanceof CSG)) ) {
     // obj already is a solid, nothing to do
     ;
-
+    
   } else if(obj.length) {                   // main() return an array, we consider it a bunch of CSG not intersecting
     //echo("putting them together");
     var o = obj[0];
@@ -952,7 +952,7 @@ OpenJsCad.Processor.convertToSolid = function(obj) {
     }
     obj = o;
     //echo("done.");
-
+    
   } else {
     throw new Error("Cannot convert to solid");
   }
@@ -965,16 +965,16 @@ OpenJsCad.Processor.prototype = {
 
     while(this.containerdiv.children.length > 0)
     {
-      this.containerdiv.removeChild(this.containerdiv.firstChild);
+      this.containerdiv.removeChild(0);
     }
-/*
+/*    
     if(!OpenJsCad.isChrome() )
     {
       var div = document.createElement("div");
       div.innerHTML = "Please note: OpenJsCad currently only runs reliably on Google Chrome!";
       this.containerdiv.appendChild(div);
     }
-*/
+*/    
     var viewerdiv = document.createElement("div");
     viewerdiv.className = "viewer";
     viewerdiv.style.width = '100%';
@@ -1003,7 +1003,7 @@ OpenJsCad.Processor.prototype = {
        this.zoomControl.onscroll = function(event) {
          var zoom = that.zoomControl;
          var newzoom=zoom.scrollLeft / (10 * zoom.offsetWidth);
-         that.zoomChangedBySlider=true; // prevent recursion via onZoomChanged
+         that.zoomChangedBySlider=true; // prevent recursion via onZoomChanged 
          that.viewer.setZoom(newzoom);
          that.zoomChangedBySlider=false;
        };
@@ -1017,14 +1017,14 @@ OpenJsCad.Processor.prototype = {
 
        this.containerdiv.appendChild(this.zoomControl);
        //this.zoomControl.scrollLeft = this.viewer.viewpointZ / this.viewer.ZOOM_MAX * this.zoomControl.offsetWidth;
-       this.zoomControl.scrollLeft = this.viewer.viewpointZ / this.viewer.ZOOM_MAX *
+       this.zoomControl.scrollLeft = this.viewer.viewpointZ / this.viewer.ZOOM_MAX * 
          (this.zoomControl.scrollWidth - this.zoomControl.offsetWidth);
 
        //end of zoom control
     }
     //this.errordiv = document.createElement("div");
     this.errordiv = document.getElementById("errordiv");
-    this.errorpre = document.createElement("pre");
+    this.errorpre = document.createElement("pre"); 
     this.errordiv.appendChild(this.errorpre);
     //this.statusdiv = document.createElement("div");
     this.statusdiv = document.getElementById("statusdiv");
@@ -1061,7 +1061,7 @@ OpenJsCad.Processor.prototype = {
     //this.parametersdiv = document.createElement("div");            // already created
     this.parametersdiv = document.getElementById("parametersdiv");   // get the info
     this.parametersdiv.id = "parametersdiv";
-    // this.parametersdiv.className = "ui-draggable";                   // via jQuery draggable() but it screws up
+    // this.parametersdiv.className = "ui-draggable";                   // via jQuery draggable() but it screws up 
 
     var headerdiv = document.createElement("div");
     //headerdiv.innerText = "Parameters:";
@@ -1091,16 +1091,16 @@ OpenJsCad.Processor.prototype = {
     instantUpdateCheckboxText.id = "instantUpdateLabel";
     this.parametersdiv.appendChild(instantUpdateCheckboxText);
 
-    this.enableItems();
+    this.enableItems();    
 
     // they exist already, so no appendChild anymore (remains here)
     //this.containerdiv.appendChild(this.statusdiv);
     //this.containerdiv.appendChild(this.errordiv);
-    //this.containerdiv.appendChild(this.parametersdiv);
+    //this.containerdiv.appendChild(this.parametersdiv); 
 
     this.clearViewer();
   },
-
+  
   setCurrentObject: function(obj) {
     this.currentObject = obj;                                  // CAG or CSG
     if(this.viewer) {
@@ -1110,10 +1110,10 @@ OpenJsCad.Processor.prototype = {
       if(obj.length)             // if it was an array (multiple CSG is now one CSG), we have to reassign currentObject
          this.currentObject = csg;
     }
-
+    
     while(this.formatDropdown.options.length > 0)
       this.formatDropdown.options.remove(0);
-
+    
     var that = this;
     this.supportedFormatsForCurrentObject().forEach(function(format) {
       var option = document.createElement("option");
@@ -1121,10 +1121,10 @@ OpenJsCad.Processor.prototype = {
       option.appendChild(document.createTextNode(that.formatInfo(format).displayName));
       that.formatDropdown.options.add(option);
     });
-
+    
     this.updateDownloadLink();
   },
-
+  
   selectedFormat: function() {
     return this.formatDropdown.options[this.formatDropdown.selectedIndex].value;
   },
@@ -1132,12 +1132,12 @@ OpenJsCad.Processor.prototype = {
   selectedFormatInfo: function() {
     return this.formatInfo(this.selectedFormat());
   },
-
+  
   updateDownloadLink: function() {
     var ext = this.selectedFormatInfo().extension;
     this.generateOutputFileButton.innerHTML = "Generate "+ext.toUpperCase();
   },
-
+  
   clearViewer: function() {
     this.clearOutputFile();
     if (this.currentObject) {
@@ -1147,7 +1147,7 @@ OpenJsCad.Processor.prototype = {
     this.viewer.state = 1; // cleared
     this.enableItems();
   },
-
+  
   abort: function() {
   // abort if state is processing
     if(this.state == 1)
@@ -1160,15 +1160,15 @@ OpenJsCad.Processor.prototype = {
       if(this.onchange) this.onchange();
     }
   },
-
+  
   enableItems: function() {
     this.abortbutton.style.display = (this.state == 1) ? "inline":"none";
     this.formatDropdown.style.display = ((!this.hasOutputFile)&&(this.currentObject))? "inline":"none";
     this.generateOutputFileButton.style.display = ((!this.hasOutputFile)&&(this.currentObject))? "inline":"none";
     this.downloadOutputFileLink.style.display = this.hasOutputFile? "inline":"none";
-    this.parametersdiv.style.display = (this.paramControls.length > 0)? "inline-block":"none";     // was 'block'
+    this.parametersdiv.style.display = (this.paramControls.length > 0)? "inline-block":"none";     // was 'block' 
     this.errordiv.style.display = this.hasError? "block":"none";
-    this.statusdiv.style.display = this.hasError? "none":"block";
+    this.statusdiv.style.display = this.hasError? "none":"block";    
   },
 
   setOpenJsCadPath: function(path) {
@@ -1181,17 +1181,17 @@ OpenJsCad.Processor.prototype = {
     }
     this.options[ 'libraries' ].push( lib );
   },
-
+  
   setError: function(txt) {
     this.hasError = (txt != "");
     this.errorpre.textContent = txt;
     this.enableItems();
   },
-
+  
   setDebugging: function(debugging) {
     this.debugging = debugging;
   },
-
+  
   // script: javascript code
   // filename: optional, the name of the .jscad file
   setJsCad: function(script, filename) {
@@ -1226,7 +1226,7 @@ OpenJsCad.Processor.prototype = {
       if(this.onchange) this.onchange();
     }
   },
-
+  
   getParamValues: function()
   {
     var paramValues = {};
@@ -1264,11 +1264,20 @@ OpenJsCad.Processor.prototype = {
       {
         value = control.options[control.selectedIndex].value;
       }
+      else if(type == "color")
+      {
+        //Convert from hex to RGB and resize 1 and 0 to match OpenSCAD color system.
+        var hex = control.value.substr(1,6);
+        var r = parseInt(hex.substr(0, 2), 16)/255;
+        var g = parseInt(hex.substr(2, 2), 16)/255;
+        var b = parseInt(hex.substr(4, 2), 16)/255;
+        value  = [r, g, b];
+      }
       paramValues[paramdef.name] = value;
     }
     return paramValues;
   },
-
+    
   rebuildSolid: function()
   {
     this.abort();
@@ -1311,7 +1320,7 @@ OpenJsCad.Processor.prototype = {
         useSync = true;
       }
     }
-
+    
     if(useSync)
     {
       try
@@ -1328,7 +1337,7 @@ OpenJsCad.Processor.prototype = {
         var errtxt = e.toString();
         if(e.stack) {
           errtxt += '\nStack trace:\n'+e.stack;
-        }
+        } 
         that.statusspan.innerHTML = "Error.";
         that.state = 3; // incomplete
       }
@@ -1336,7 +1345,7 @@ OpenJsCad.Processor.prototype = {
       if(that.onchange) that.onchange();
     }
   },
-
+  
   getState: function() {
     return this.state;
   },
@@ -1377,18 +1386,18 @@ OpenJsCad.Processor.prototype = {
 
   currentObjectToBlob: function() {
     var format = this.selectedFormat();
-
+    
     var blob;
-    if(format == "stla") {
-      blob = this.currentObject.toStlString();
+    if(format == "stla") {      
+      blob = this.currentObject.toStlString();        
       blob = new Blob([blob],{ type: this.formatInfo(format).mimetype });
     }
-    else if(format == "stlb") {
+    else if(format == "stlb") {      
       //blob = this.currentObject.fixTJunctions().toStlBinary();   // gives normal errors, but we keep it for now (fixTJunctions() needs debugging)
-      blob = this.currentObject.toStlBinary({webBlob: true});
+      blob = this.currentObject.toStlBinary({webBlob: true});     
 
       // -- binary string -> blob gives bad data, so we request cgs.js already blobbing the binary
-      //blob = new Blob([blob],{ type: this.formatInfo(format).mimetype+"/charset=UTF-8" });
+      //blob = new Blob([blob],{ type: this.formatInfo(format).mimetype+"/charset=UTF-8" }); 
     }
     else if(format == "amf") {
       blob = this.currentObject.toAMFString({
@@ -1396,7 +1405,7 @@ OpenJsCad.Processor.prototype = {
         date: new Date()
       });
       blob = new Blob([blob],{ type: this.formatInfo(format).mimetype });
-    }
+    }  
     else if(format == "x3d") {
       blob = this.currentObject.fixTJunctions().toX3D();
     }
@@ -1405,10 +1414,10 @@ OpenJsCad.Processor.prototype = {
     }
     else {
       throw new Error("Not supported");
-    }
+    }    
     return blob;
   },
-
+  
   supportedFormatsForCurrentObject: function() {
     if (this.currentObject instanceof CSG) {
       return ["stlb", "stla", "amf", "x3d"];
@@ -1418,7 +1427,7 @@ OpenJsCad.Processor.prototype = {
       throw new Error("Not supported");
     }
   },
-
+  
   formatInfo: function(format) {
     return {
       stla: {
@@ -1458,7 +1467,7 @@ OpenJsCad.Processor.prototype = {
     var blob = this.currentObjectToBlob();
     var windowURL=OpenJsCad.getWindowURL();
     this.outputFileBlobUrl = windowURL.createObjectURL(blob);
-    if(!this.outputFileBlobUrl) throw new Error("createObjectURL() failed");
+    if(!this.outputFileBlobUrl) throw new Error("createObjectURL() failed"); 
     this.hasOutputFile = true;
     this.downloadOutputFileLink.href = this.outputFileBlobUrl;
     this.downloadOutputFileLink.innerHTML = this.downloadLinkTextForCurrentObject();
@@ -1487,7 +1496,7 @@ OpenJsCad.Processor.prototype = {
                     fileWriter.onwriteend = function(e) {
                       that.hasOutputFile = true;
                       that.downloadOutputFileLink.href = fileEntry.toURL();
-                      that.downloadOutputFileLink.type = that.selectedFormatInfo().mimetype;
+                      that.downloadOutputFileLink.type = that.selectedFormatInfo().mimetype; 
                       that.downloadOutputFileLink.innerHTML = that.downloadLinkTextForCurrentObject();
                       that.downloadOutputFileLink.setAttribute("download", fileEntry.name);
                       that.enableItems();
@@ -1497,22 +1506,22 @@ OpenJsCad.Processor.prototype = {
                       throw new Error('Write failed: ' + e.toString());
                     };
                     var blob = that.currentObjectToBlob();
-                    console.log(blob,blob.length);
+                    console.log(blob,blob.length);                
                     fileWriter.write(blob);
-                  },
-                  function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "createWriter");}
+                  }, 
+                  function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "createWriter");} 
                 );
               },
-              function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "getFile('"+filename+"')");}
+              function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "getFile('"+filename+"')");} 
             );
           },
-          function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "getDirectory('"+dirname+"')");}
-        );
-      },
+          function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "getDirectory('"+dirname+"')");} 
+        );         
+      }, 
       function(fileerror){OpenJsCad.FileSystemApiErrorHandler(fileerror, "requestFileSystem");}
     );
   },
-
+  
   createParamControls: function() {
     this.parameterstable.innerHTML = "";
     this.paramControls = [];
@@ -1531,13 +1540,14 @@ OpenJsCad.Processor.prototype = {
       {
         type = paramdef.type;
       }
-      if( (type !== "text") && (type !== "int") && (type !== "float") && (type !== "choice") && (type !== "number") )
+      if( (type !== "text") && (type !== "int") && (type !== "float") && (type !== "choice") && (type !== "number") && (type !== "color") )
       {
         throw new Error(errorprefix + "Unknown parameter type '"+type+"'");
       }
       var control;
       if( (type == "text") || (type == "int") || (type == "float") || (type == "number") )
       {
+        console.log("found a text/int/float/number", control);
         control = document.createElement("input");
         if (type == "number")
             control.type = "number";
@@ -1560,7 +1570,7 @@ OpenJsCad.Processor.prototype = {
             control.value = "";
           }
         }
-        if(paramdef.size!==undefined)
+        if(paramdef.size!==undefined) 
            control.size = paramdef.size;
         for (var property in paramdef)
             if (paramdef.hasOwnProperty (property))
@@ -1572,7 +1582,7 @@ OpenJsCad.Processor.prototype = {
         if(!('values' in paramdef))
         {
           throw new Error(errorprefix + "Should include a 'values' parameter");
-        }
+        }        
         control = document.createElement("select");
         var values = paramdef.values;
         var captions;
@@ -1613,11 +1623,46 @@ OpenJsCad.Processor.prototype = {
         if(values.length > 0)
         {
           control.selectedIndex = selectedindex;
+        }        
+      }
+      else if(type == "color")
+      {
+        control = document.createElement("input");
+        control.type = "color"
+        console.log("found a color", control, "and a paramdef", paramdef);
+        function rgb2hex(colorarray) {
+          var rgb = colorarray[0]*255 << 16 | colorarray[1]*255 << 8 | colorarray[2]*255;
+          return '#' + (0x1000000 | rgb).toString(16).substring(1);
         }
+        if ('default' in paramdef)
+        {
+          if(paramdef["default"] > 3)
+          {
+            throw new Error(errorprefix + "Colors parameters should be an array of 3 elements, [r,g,b]. Colors with alpha (transparency) are not supported.");
+          }
+          if(Math.min.apply(null, paramdef["default"]) < 0 || Math.max.apply(null, paramdef["default"]) > 1 ) 
+          {
+            throw new Error(errorprefix + "Color values should be between 0 and 1. (e.g. [1,0,0.2] and NOT [255,0,51])");
+          }
+          control.value = rgb2hex(paramdef["default"]);
+        }
+        else
+        {
+          control.value = rgb2hex([1,.4,1,1]);      // -- default color
+        }
+        if(paramdef.size!==undefined)
+        {
+          control.size = paramdef.size;
+        }
+        for (var property in paramdef)
+            if (paramdef.hasOwnProperty (property))
+                if ((property != "name") && (property != "type") && (property != "default") && (property != "initial") && (property != "caption") )
+                    control.setAttribute (property, paramdef[property]);
       }
       // implementing instantUpdate
-      control.onchange = function() {
-         if(document.getElementById("instantUpdate").checked==true) {
+      control.onchange = function() { 
+         if(document.getElementById("instantUpdate").checked==true) 
+         {
             that.rebuildSolid();
          }
       };
@@ -1630,7 +1675,6 @@ OpenJsCad.Processor.prototype = {
         label = paramdef.caption;
         td.className = 'caption';
       }
-
       td.innerHTML = label;
       tr.appendChild(td);
       td = document.createElement("td");
@@ -1641,7 +1685,7 @@ OpenJsCad.Processor.prototype = {
     var that = this;
     tablerows.map(function(tr){
       that.parameterstable.appendChild(tr);
-    });
+    }); 
     this.paramControls = paramControls;
   },
 };
