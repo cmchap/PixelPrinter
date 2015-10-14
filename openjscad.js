@@ -1547,7 +1547,6 @@ OpenJsCad.Processor.prototype = {
       var control;
       if( (type == "text") || (type == "int") || (type == "float") || (type == "number") )
       {
-        console.log("found a text/int/float/number", control);
         control = document.createElement("input");
         if (type == "number")
             control.type = "number";
@@ -1629,7 +1628,6 @@ OpenJsCad.Processor.prototype = {
       {
         control = document.createElement("input");
         control.type = "color"
-        console.log("found a color", control, "and a paramdef", paramdef);
         function rgb2hex(colorarray) {
           var rgb = colorarray[0]*255 << 16 | colorarray[1]*255 << 8 | colorarray[2]*255;
           return '#' + (0x1000000 | rgb).toString(16).substring(1);

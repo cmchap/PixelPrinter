@@ -8,15 +8,11 @@ var sourceimage = new Image();
 var canvas = $('#original-canvas');
 var context = canvas[0].getContext('2d');
 
-var zcanvas = $('#zoom-canvas');
-var zcontext = zcanvas[0].getContext('2d');
+var hcanvas = document.createElement("canvas");
+var hcontext = hcanvas.getContext("2d");
 
-var scalingfactor = 10; 
-var zoomcanvassize = 250;
-var totalscale = scalingfactor;
-var scrollzoomincrement = 0.25; //decimal between 0 and 1 exclusive.
-var minzoomamount = 1;
-var maxzoomamount = 25;
+var hscanvas = document.createElement("canvas");
+var hscontext = hscanvas.getContext("2d");
 
 var currentcolor = $('#current-color');
 
@@ -28,34 +24,20 @@ var savedcolors = [];
 
 var originalImageData;
 var simplifiedImageData;
-var greyscalesavedcolors = [];
+var grayscalesavedcolors = [];
 
 /*
  * Functions
  */
 
-function setCanvasSize(canv, canvwidth, canvheight) {
-	//WARNING this clears the canvas
-	canv.width = canvwidth;
-	canv.height  = canvheight;
-}
-
 function resetAll() {
 	context.clearRect(0, 0, canvas[0].width, canvas[0].height);
-	zcontext.clearRect(0, 0, zcanvas[0].width, zcanvas[0].height);
+	hcontext.clearRect(0,0, hcanvas.width, hcanvas.height);
 	scontext.clearRect(0, 0, scanvas[0].width, scanvas[0].height);
 
-	// zcontext.scale(scalingfactor/totalscale, scalingfactor/totalscale); //FIX THIS SO IT RESETS THE SCALE WHEN THE ORIGINAL CANVAS IS CHANGED
-	zcontext.restore();
-
-	canvas[0].width = 0;
-	canvas[0].height = 0;
-	scanvas[0].width = 0;
-	scanvas[0].height = 0;
-
-	zcanvas[0].style.visibility = 'hidden';
-
-	$('#make-grayscale').attr('checked', false);
+	scanvas.hide();
+	$('#create-simplified').hide();
+	$('#simplify-colors-button').hide();
 
 	savedcolorlist.empty();
 	savedcolors = [];
@@ -64,7 +46,6 @@ function resetAll() {
 }
 
 function readSelector(sel) {
-	// console.log('selector set to ' + sel.value);
 	if (sel.value === 'mushroom') {
 		return 'images/mushroom.png';
 	} else if (sel.value === 'yoshi') {
@@ -86,65 +67,50 @@ function readSelector(sel) {
 	}
 }
 
-function getFittingRatio(srcimg, canv) {
+// Returns a value greater than 1 when A is larger than B in width or height.
+function getFittingMultiplier(A, B) {
 	var ratio = 1;
-	if (srcimg.width > canv.width || srcimg.height > canv.height) {
-		var hRatio = canv.width / srcimg.width;
-		var vRatio = canv.height / srcimg.height;
-		ratio = Math.min(hRatio, vRatio);
-	}
+	var hRatio = A.width / B.width;
+	var wRatio = A.height / B.height;
+	ratio = Math.min(hRatio, wRatio);
 	return ratio;
 }
 
-function fitImageToCanvas(srcimg, canv) {
-	ratio = getFittingRatio(srcimg, canv);
-	canv.width = srcimg.width * ratio;
-	canv.height = srcimg.height * ratio;
+// Resize A to fit its longest side into B.
+function fitAToB(A, B) {
+	A.width = B.width;
+	A.height = B.height;
 }
 
-function makeGrayscale(canv, ctx, thisobj) {
-	if (thisobj.checked === false) {
-		ctx.putImageData(originalImageData,0,0);
-	} else {
-		var imageData = ctx.getImageData(0,0,canv.width, canv.height);
-		var data = imageData.data;
-		for (var i = 0; i < data.length; i += 4) {
-			var avg = (data[i] + data[i +1] + data[i +2]) / 3;
-			data[i]     = avg; // red
-			data[i + 1] = avg; // green
-			data[i + 2] = avg; // blue
-			// data[i + 3] = 1;   // alpha
-		}
-		ctx.putImageData(imageData, 0, 0);
-	}
-}
-
-function setImageFromFile(thiselement, srcimg, canv, ctx, sel) {
+function setImageFromFile(thiselement, srcimg, canv, ctx, hcanv, hctx, sel) {
 	sel.append($('<option/>', {
 		value: 'none',
 		text: 'Select an image',
 	}));
 	sel.val('none');
 	resetAll();
-	setCanvasSize(canv, 200, 200);
 	if (thiselement.files && thiselement.files[0]) {
 		var FR = new FileReader();
 		FR.onload = function(e) {
 			srcimg.onload = function() {
-				var ratio = getFittingRatio(srcimg, canv);
-				fitImageToCanvas(srcimg, canv);
+				var ratio = getFittingMultiplier(canv, srcimg);
+				fitAToB(hcanv, srcimg);
+				canv.width = srcimg.width*ratio;
+				canv.height = srcimg.height*ratio;
+				ctx.imageSmoothingEnabled = false;
+				ctx.scale(ratio,ratio);
 				ctx.drawImage(
 					srcimg,
 					0,
-					0,
-					srcimg.width,
-					srcimg.height,
-					0,
-					0,
-					srcimg.width*ratio,
-					srcimg.height*ratio
+					0
 				);
-				originalImageData = context.getImageData(0,0,canvas[0].width, canvas[0].height);
+				hctx.drawImage(
+					srcimg,
+					0,
+					0
+				);
+				ctx.scale(1/ratio,1/ratio);
+				originalImageData = hctx.getImageData(0,0,hcanv.width, hcanv.height);
 			};
 			srcimg.src = e.target.result;
 		};
@@ -152,34 +118,34 @@ function setImageFromFile(thiselement, srcimg, canv, ctx, sel) {
 	}
 }
 
-function setImageFromSelector(srcimg, sel, canv, ctx) {
+function setImageFromSelector(srcimg, sel, canv, ctx, hcanv, hctx) {
 	var selectorvalue = readSelector(sel[0]);
 	if (selectorvalue === null) {
 		return;
 	} else {
 		resetAll();
-		setCanvasSize(canv, 200, 200);
 		srcimg.onload = function() {
-			var ratio = getFittingRatio(srcimg, canv);
-			fitImageToCanvas(srcimg, canv);
+			var ratio = getFittingMultiplier(canv, srcimg);
+			fitAToB(hcanv, srcimg);
+			canv.width = srcimg.width*ratio;
+			canv.height = srcimg.height*ratio;
+			ctx.imageSmoothingEnabled = false;
+			ctx.scale(ratio,ratio);
 			ctx.drawImage(
 				srcimg,
 				0,
-				0,
-				srcimg.width,
-				srcimg.height,
-				0,
-				0,
-				srcimg.width*ratio,
-				srcimg.height*ratio
+				0
 			);
-			originalImageData = context.getImageData(0,0,canvas[0].width, canvas[0].height);
+			hctx.drawImage(
+				srcimg,
+				0,
+				0
+			);
+			ctx.scale(1/ratio,1/ratio);
+			originalImageData = hctx.getImageData(0,0,hcanv.width, hcanv.height);
 		};
 		srcimg.src = selectorvalue;
 	}
-
-	var selectnone = sel.children("option[value='none']");
-	if (selectnone) { selectnone.remove();}
 }
 
 function getMousePos(canv, evt) {
@@ -188,117 +154,6 @@ function getMousePos(canv, evt) {
 		x: evt.clientX - Math.floor(rect.left),
 		y: evt.clientY - Math.floor(rect.top)
 	};
-}
-
-function showZoom(scalingfctr, canv, zcanv, ctx, zctx, evt) {
-	var mousePos = getMousePos(canv, evt);
-
-	var sx = 0;
-	var sy = 0;
-	var swidth = canv.width;
-	var sheight = canv.height;
-	var dx = mousePos.x * -1 - 0.5;
-	var dy = mousePos.y * -1 - 0.5;
-	var dwidth = canv.width;
-	var dheight = canv.height;
-
-	zctx.imageSmoothingEnabled = false;
-
-	//Clear the image drawn at the previous mouse point to stop artifacting on the upper-left edge of the image
-	zctx.clearRect(
-		zcanv.width/2*-1,
-		zcanv.height/2*-1,
-		zcanv.width,
-		zcanv.height
-	);
-
-	//Draw the zoomed image to the zoom canvas
-	zctx.drawImage(
-		canv,
-		sx,
-		sy,
-		swidth,
-		sheight,
-		dx,
-		dy,
-		dwidth,
-		dheight
-	);
-
-	//Draw the small square in the center of the zoom canvas
-	// var boxlinewidth = 2/scalingfctr;
-	var boxlinewidth = 4/scalingfctr;
-
-	var boxwidth = 1;
-	var boxheight = 1;
-
-	// var boxx = boxwidth/-2;
-	// var boxy = boxheight/-2;
-
-	var boxx = boxwidth/-2;
-	var boxy = boxheight/-2;
-
-	zctx.strokeStyle = 'black';
-	zctx.lineWidth = boxlinewidth;
-	zctx.strokeRect(
-		boxx,
-		boxy,
-		boxwidth,
-		boxheight
-	);
-}
-
-function getNewScale(minzmamount, maxzmamount, changeinnewscale, evt) {	
-		var newscalingfactor = 1;
-
-		var newtotalscale;
-
-		if (evt.deltaY > 0) {
-			//zoom in
-			console.log('zoomed in');
-			newtotalscale = totalscale*(newscalingfactor+changeinnewscale);
-
-			if (newtotalscale > maxzmamount) {
-				console.log('special case');
-				console.log('newscalingfactor = ', newscalingfactor);
-				newscalingfactor = maxzmamount/totalscale;
-				console.log('newscalingfactor = ', newscalingfactor);
-				console.log('totalscale = ', totalscale);
-				totalscale = totalscale*newscalingfactor;
-				console.log('totalscale = ', totalscale);
-			} else {
-				newscalingfactor = newscalingfactor + changeinnewscale;
-				console.log(newscalingfactor);
-				totalscale = totalscale*newscalingfactor;
-				console.log(totalscale);
-			}
-
-		} 
-
-		if (evt.deltaY < 0 ) {
-			//zoom out
-			console.log('zoomed out');
-			newtotalscale = totalscale*(newscalingfactor-changeinnewscale);
-
-			if (newtotalscale < minzmamount) {
-				console.log('special case');
-				console.log('newscalingfactor = ', newscalingfactor);
-				newscalingfactor = minzmamount/totalscale;
-				console.log('newscalingfactor = ', newscalingfactor);
-				console.log('totalscale = ', totalscale);
-				totalscale = totalscale*newscalingfactor;
-				console.log('totalscale = ', totalscale);
-			} else {
-				newscalingfactor = newscalingfactor - changeinnewscale;
-				console.log(newscalingfactor);
-				totalscale = totalscale*newscalingfactor;
-				console.log(totalscale);
-			}
-
-		} 
-		console.log('newscalingfactor = ', newscalingfactor);
-		console.log('totalscale = ', totalscale);
-		return newscalingfactor;
 }
 
 function existsInArray(needle, haystack){
@@ -339,10 +194,8 @@ function updateSelectedColor(canv, ctx, ev) {
 
 function showHideSimplifyColorsButton(svdcolors) {
 	if (svdcolors.length === 2 && $('#simplify-colors-button').is(":visible") === false) {
-		// console.log('Showing Simplify Colors Button');
 		$('#simplify-colors-button').show();
 	} else if (svdcolors.length === 1 && $('#simplify-colors-button').is(":visible") === true) {
-		// console.log('Hiding Simplify Colors Button');
 		$('#simplify-colors-button').hide();
 	}
 }
@@ -404,112 +257,82 @@ function removeSavedColor(clickedelement, colorlist) {
 }
 
 
-function simplifyColors(canv, ctx, scanv, sctx, svdcolors) {
-	var imageData = ctx.getImageData(0, 0, canv.width, canv.height);
+function simplifyColors(hcanv, hctx, scanv, sctx, hscanv, hsctx, svdcolors, srcimg) {
+	sctx.restore();
+	sctx.clearRect(0,0,scanv.width,scanv.height);
+	var ratio = getFittingMultiplier(scanv, hcanv);
+	var imageData = hctx.getImageData(0, 0, hcanv.width, hcanv.height);
 	var data = imageData.data;
 
-	for (var pixel = 0; pixel < data.length; pixel+=4) {
+	scanv.width = srcimg.width*ratio;
+	scanv.height = srcimg.height*ratio;
+	sctx.imageSmoothingEnabled = false;
+
+	for (var value = 0; value < data.length; value+=4) {
 		var distances = [];
+		var rdata = data[value];
+		var gdata = data[value+1];
+		var bdata = data[value+2];
 
-		var rdata = data[pixel];
-		var gdata = data[pixel+1];
-		var bdata = data[pixel+2];
+		for (var color = 0; color < svdcolors.length; color++) {
+			var rsaved = svdcolors[color][0];
+			var gsaved = svdcolors[color][1];
+			var bsaved = svdcolors[color][2];
 
-		//GRAYSCALE THE ORIGINAL IMAGE
-		var avg = (rdata + gdata + bdata) / 3;
-		avg = Math.round(avg);
-		rdata = avg; // red
-		gdata = avg; // green
-		bdata = avg; // blue
-
-		for (var savedcolor = 0; savedcolor < svdcolors.length; savedcolor++){
-			var rsaved = svdcolors[savedcolor][0];
-			var gsaved = svdcolors[savedcolor][1];
-			var bsaved = svdcolors[savedcolor][2];
-
-			//GRAYSCALE THE SAVED COLORS
-			var savedavg = (rsaved + gsaved + bsaved) / 3;
-			savedavg = Math.round(savedavg);
-			rsaved = savedavg; // red
-			gsaved = savedavg; // green
-			bsaved = savedavg; // blue
-
-
-			if (rdata === rsaved && gdata === gsaved && bdata === bsaved) {
+			if (rdata == rsaved && gdata == gsaved && bdata == gsaved) {
 				distances.push(0);
-				break;
+			} 
+			else {
+				var rdist = Math.pow(rsaved-rdata,2);
+				var gdist = Math.pow(gsaved-gdata,2);
+				var bdist = Math.pow(bsaved-bdata,2);
+
+				var dist = Math.sqrt(rdist+gdist+bdist);
+				distances.push(dist);
 			}
-
-			//FULL COLOR SIMPLIFICATION
-			// var dist = Math.sqrt(Math.pow(rsaved-rdata,2)+Math.pow(gsaved-gdata,2)+Math.pow(bsaved-bdata,2));
-
-			//GRAYSCALE SIMPLIFICATION
-			var dist = Math.abs(rsaved-rdata);
-
-			distances.push(dist);
 		}
-
-		var shortestdistindex = distances.indexOf(Math.min.apply(this,distances));
-
-		//FULL COLOR SIPLIFICATION
-		// data[pixel] = svdcolors[shortestdistindex][0];
-		// data[pixel+1] = svdcolors[shortestdistindex][1];
-		// data[pixel+2] = svdcolors[shortestdistindex][2];
-
-		//GRAYSCALE SIMPLIFICATION
-		var shortestavg = (svdcolors[shortestdistindex][0] + svdcolors[shortestdistindex][1] + svdcolors[shortestdistindex][2])/3;
-		data[pixel]   = shortestavg;
-		data[pixel+1] = shortestavg;
-		data[pixel+2] = shortestavg;
+		var shortestdistindex = distances.indexOf(Math.min.apply(Math,distances));
+		var shortestavg = (svdcolors[shortestdistindex][0] + svdcolors[shortestdistindex][1] + svdcolors[shortestdistindex][2]) / 3;
+		data[value]   = shortestavg;
+		data[value+1] = shortestavg;
+		data[value+2] = shortestavg;
 	}
-	scanv.width = canv.width;
-	scanv.height = canv.height;
 
-	sctx.putImageData(imageData,0,0);
+	fitAToB(hscanv, srcimg);
+	hsctx.putImageData(imageData,0,0);
+
+	sctx.scale(ratio,ratio);
+	sctx.drawImage(hscanv,0,0);
+	sctx.scale(1/ratio,1/ratio);
+
 
 	simplifiedImageData = imageData;
 
 
-	//SAVE GRAYSCALE COLORS
-	greyscalesavedcolors = [];
-	for (var color = 0; color < svdcolors.length; color++){
-		var savg = (svdcolors[color][0] + svdcolors[color][1] + svdcolors[color][2]) / 3;
+	// SAVE GRAYSCALE COLORS
+	grayscalesavedcolors = [];
+	for (var fullcolor = 0; fullcolor < svdcolors.length; fullcolor++) {
+		var savg = (svdcolors[fullcolor][0] + svdcolors[fullcolor][1] + svdcolors[fullcolor][2]) / 3;
 		savg = Math.round(savg);
-		greyscalesavedcolors.push(savg); 
+		grayscalesavedcolors.push(savg); 
 	}
 
 }
 
-// function copyTextToClipboard(text) {
-//  	var textArea = document.createElement("textarea");
-// 	textArea.value = text;
+function sortDescending(a, b) {return b - a;}
 
-// 	document.body.appendChild(textArea);
-
-// 	textArea.select();
-
-// 	try {
-// 		var successful = document.execCommand('copy');
-// 		var msg = successful ? 'successful' : 'unsuccessful';
-// 		console.log('Copying text command was ' + msg);
-// 	} catch (err) {
-// 		console.log('Oops, unable to copy');
-// 	}
-// 	document.body.removeChild(textArea);
-// }
-
-function generateArray(sdata, gcolors, scanv) {
-	// var text = '[';
+function generateArray(sdata, gcolors, hscanv) {
 
 	var valuearray = [];
 	var jscadarray = [];
 	var rowarray = [];
 
-	function sortDescending(a, b) {return b - a;}
-	var sortedcolors = gcolors.sort(sortDescending);
+	// var sortedcolors = gcolors.sort(sortDescending);
+
+	var sortedcolors = gcolors;
 
 	for (var pixel = 0; pixel < sdata.data.length; pixel+=4) {
-		if (sdata.data[pixel+3] === 0) { //correct for transparent black pixels TEST THIS
+		if (sdata.data[pixel+3] === 0) { //"correct" for transparent black pixels
 			sdata.data[pixel] = 255;
 			sdata.data[pixel+1] = 255;
 			sdata.data[pixel+2] = 255;
@@ -518,26 +341,20 @@ function generateArray(sdata, gcolors, scanv) {
 		var value = $.inArray(sdata.data[pixel], sortedcolors)+1; //index plus one in sortedcolors that matches the value of the red pixel in sdata
 		valuearray.push(value);
 	}
-
 	for (var i = 0; i < valuearray.length; i++) {
 		rowarray.push(valuearray[i]);
 
-		if ((i+1) % scanv.width === 0) {
+		if ((i+1) % hscanv.width === 0) {
 			jscadarray.push(rowarray);
 			rowarray = [];
 		}
 	}
  
  	var stringarray = JSON.stringify(jscadarray);
- 	// console.log('stringarray = ', stringarray);
- 	// copyTextToClipboard(stringarray);
  	return stringarray;
- 	// $('.copied.original')[0].style.display = 'hidden';
- 	// $('.copied.original').fadeOut();
-  // 	copiedtext.fadeIn().delay(1500).fadeOut();
 }
 
-function generateArrayOriginal(odata, canv) {
+function generateArrayOriginal(odata, hcanv) {
 
 	var uniquecolors = [];
 	var origdata 	 = odata.data;
@@ -546,7 +363,7 @@ function generateArrayOriginal(odata, canv) {
 	var rowarray 	 = [];
 
 	for (var i = 0; i < origdata.length; i += 4) {
-		if (origdata[i+3] === 0) { //correct for transparent black pixels TEST THIS
+		if (origdata[i+3] === 0) { //"correct" for transparent black pixels
 			origdata[i] = 255;
 			origdata[i+1] = 255;
 			origdata[i+2] = 255;
@@ -557,15 +374,13 @@ function generateArrayOriginal(odata, canv) {
 		origdata[i + 1] = avg; // green
 		origdata[i + 2] = avg; // blue
 
+		//add unique colors to a list
 		if ($.inArray(avg, uniquecolors) === -1) {
 			uniquecolors.push(avg);
 		}
 	}
 
-	function sortDescending(a, b) {return b - a;}
 	var sorteduniquecolors = uniquecolors.sort(sortDescending);
-
-	// console.log('sorteduniquecolors = ', sorteduniquecolors);
 
 
 	for (var pixel = 0; pixel < origdata.length; pixel+=4) {
@@ -576,18 +391,14 @@ function generateArrayOriginal(odata, canv) {
 	for (var j = 0; j < valuearray.length; j++) {
 		rowarray.push(valuearray[j]);
 
-		if ((j+1) % canv.width === 0) {
+		if ((j+1) % hcanv.width === 0) {
 			jscadarray.push(rowarray);
 			rowarray = [];
 		}
 	}
 
  	var stringarray = JSON.stringify(jscadarray);
- 	// console.log('stringarray = ', stringarray);
- 	// copyTextToClipboard(stringarray);
  	return stringarray;
- 	// $('.copied.simplified').fadeOut();
-  // 	copiedtext.fadeIn().delay(1500).fadeOut();
 }
 
 /*
@@ -595,53 +406,36 @@ function generateArrayOriginal(odata, canv) {
  */
 
 $(window).load( function() {
-	setImageFromSelector(sourceimage, selector, canvas[0], context);
+	setImageFromSelector(sourceimage, selector, canvas[0], context, hcanvas, hcontext);
 	$('#simplify-colors-button').hide();
-	zcanvas[0].style.visibility = 'hidden';
+	context.imageSmoothingEnabled = false;
+	hcontext.imageSmoothingEnabled = false;
+	scontext.imageSmoothingEnabled = false;
+	hscontext.imageSmoothingEnabled = false;
+	scanvas.hide();
+	$('#create-simplified').hide();
 	currentcolor[0].style.visibility = 'hidden';
-	zcanvas[0].width = zoomcanvassize;
-	zcanvas[0].height = zoomcanvassize;
-	zcontext.translate(zoomcanvassize/2, zoomcanvassize/2);
-	zcontext.scale(scalingfactor, scalingfactor);
-	zcontext.save();
+	scontext.save();
 });
 
 selector.change( function() {
-	setImageFromSelector(sourceimage, selector, canvas[0], context);
-
+	setImageFromSelector(sourceimage, selector, canvas[0], context, hcanvas, hcontext);
 });
 
 $('#file-upload').change( function() {
-	setImageFromFile(this, sourceimage, canvas[0], context, selector);
+	setImageFromFile(this, sourceimage, canvas[0], context, hcanvas, hcontext, selector);
 
-});
-
-$('#make-grayscale').click( function() {
-	makeGrayscale(canvas[0], context, this);
 });
 
 canvas.mouseenter( function() {
-	zcanvas[0].style.visibility = 'visible';
 	currentcolor[0].style.visibility = 'visible';
-	// console.log('zcanvas is visible');
 });
 canvas.mouseout( function() {
-	zcanvas[0].style.visibility = 'hidden';
 	currentcolor[0].style.visibility = 'hidden';
-	// console.log('zcanvas is hidden');
 });
 
 canvas.mousemove( function(e) {
 	updateSelectedColor(canvas[0], context, e);
-	showZoom(totalscale, canvas[0], zcanvas[0], context, zcontext, e);
-});
-
-canvas.mousewheel(function (e) {
-	console.log('e.deltaY = ', e.deltaY);
-	e.preventDefault();
-	var newscalingfactor = getNewScale(minzoomamount, maxzoomamount, scrollzoomincrement, e );
-	zcontext.scale(newscalingfactor, newscalingfactor);
-	showZoom(totalscale, canvas[0], zcanvas[0], context, zcontext, e);
 });
 
 canvas.click( function(e) {
@@ -649,28 +443,18 @@ canvas.click( function(e) {
 });
 
 $('#simplify-colors-button').click( function() {
-	simplifyColors(canvas[0], context, scanvas[0], scontext, savedcolors);
-});
-
-scanvas.mouseenter( function() {
-	zcanvas[0].style.visibility = 'visible';
-});
-scanvas.mouseout( function() {
-	zcanvas[0].style.visibility = 'hidden';
-});
-
-scanvas.mousemove( function(e) {
-	updateSelectedColor(scanvas[0], scontext, e);
-	showZoom(totalscale, scanvas[0], zcanvas[0], scontext, zcontext, e);
+	simplifyColors(hcanvas, hcontext, scanvas[0], scontext, hscanvas, hscontext, savedcolors, sourceimage);
+	scanvas.show();
+	$('#create-simplified').show();
 });
 
 $('#create-simplified').click( function() {
-	$('.parameterstable td.caption:contains("New Bitmap Array")').next().children('input').val(generateArray(simplifiedImageData, greyscalesavedcolors, scanvas[0]));
+	$('.parameterstable td.caption:contains("New Bitmap Array")').next().children('input').val(generateArray(simplifiedImageData, grayscalesavedcolors, hscanvas));
 	$('.parameterstable').next('button:contains("Update")').trigger('click');
 });
 
 $('#create-original').click( function() {
-	$('.parameterstable td.caption:contains("New Bitmap Array")').next().children('input').val(generateArrayOriginal(originalImageData, canvas[0]));
+	$('.parameterstable td.caption:contains("New Bitmap Array")').next().children('input').val(generateArrayOriginal(originalImageData, hcanvas));
 	$('.parameterstable').next('button:contains("Update")').trigger('click');
 
 });
