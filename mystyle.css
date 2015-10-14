@@ -27,12 +27,26 @@
 	overflow: scroll;
 }
 
-#color-simplifier .copied {
-	display: inline;
+canvas {
+	border: 1px solid red;
 }
 
-#color-simplifier #current-color {
+#color-simplifier #original-canvas, #color-simplifier #simplified-canvas {
+	cursor: crosshair;
+	float: left;
+	margin: auto 0.5em;
+
+}
+/*#color-simplifier #original-canvas {
+	float: left;
+}
+*/
+/*#color-simplifier #current-color {
 	margin-bottom: 1em;
+}*/
+
+#color-simplifier button {
+	margin-top: 1em;
 }
 
 #color-simplifier #simplify-colors-button {
@@ -67,4 +81,18 @@
 
 #color-simplifier .remove {
 	margin-left: 1em;
+}
+
+#color-simplifier .clearfix:before,
+#color-simplifier .clearfix:after {
+  content: "";
+  display: table;
+}
+
+#color-simplifier .clearfix:after {
+  clear: both;
+}
+
+#color-simplifier .clearfix {
+  zoom: 1; /* ie 6/7 */
 }

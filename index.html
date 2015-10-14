@@ -36,7 +36,7 @@ Todo:
 - DONE: include(); support of multiple files, see http://jsfiddle.net/yybRu/
 -->
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-  <title>8bit STL Generator</title>
+  <title>PixelPrinter</title>
   <link rel="shortcut icon" href="imgs/favicon.png" type="image/x-png">
   <link rel="stylesheet" href="jquery/themes/base/jquery-ui.css" />
   <link rel="stylesheet" href="style.css" type="text/css">
@@ -138,25 +138,21 @@ $(document).ready(function() {
   </select>
   <br>
   <br>
-  Icon-sized images (sub-50px square) work best
+  <input type='file' id="file-upload" />
   <br>
   <br>
-  <input type='file' id="file-upload" /><input id="make-grayscale" type='checkbox'>Make Grayscale</input>
+  <div id="canvas-div" class="clearfix">
+    <canvas id="original-canvas" width="250" height="250"></canvas>
+    <canvas id="simplified-canvas" width="250" height="250"></canvas>
+  </div>
   <br>
+  <div id="current-color">Color Under Cursor: <span id="selected-color" class="color-swatch"></span><span id="current-color-rgba"></span></div>
+  <button id='simplify-colors-button'>Simplify Colors</button>
   <br>
   <button id="create-original">Generate Model from Original Image</button>
   <br>
   <button id="create-simplified">Generate Model from Simplified Image</button>
   <br>
-  <br>
-  <canvas id="original-canvas" width="0" height="0"></canvas>
-  <canvas id="zoom-canvas" width="0" height="0"></canvas>
-  <br>
-  <canvas id="simplified-canvas" width="0" height="0"></canvas>
-  <br>
-  <br>
-  <div id="current-color">Color Under Cursor: <span id="selected-color" class="color-swatch"></span><span id="current-color-rgba"></span></div>
-  <button id='simplify-colors-button'>Simplify Colors</button>
   <p>Saved Colors:</p>
   <table id="saved-color-list">
   </table>
@@ -201,8 +197,10 @@ $(document).ready(function() {
 
 <div id=about>
 <img src="imgs/title.png"><br>
-Version <script>document.write(version);</script>
+<!-- Version <script>document.write(version);</script> -->
 <p>
+by <a src="http://twitter.com/cmchap">Cory Chapman</a>
+forked from OpenJSCAD.org
 by Ren&eacute; K. M&uuml;ller (UI & CLI),
 Joost Nieuwenhuijse (core), 
 Stefan Baumann (core),
@@ -216,7 +214,7 @@ Joost Nieuwenhuijse,
 Alexandre Girard
 <p>
 License: MIT License<br>
-Get your copy/clone/fork from <a href="https://github.com/Spiritdude/OpenJSCAD.org" target=_blank>GitHub: OpenJSCAD</a>
+Get your copy/clone/fork from <a href="https://github.com/cmchap/PixelPrinter" target=_blank>GitHub: PixelPrinter</a>
 <p><br>
 <a class=okButton href='#' onclick="$('#about').hide(); return false;"> OK </a>
 </div>
@@ -441,8 +439,7 @@ if(me=='web-online') {
 </div>
 </div>
 <div id=footer>
-OpenJSCAD.org 
-<script>document.write(version);</script>, MIT License, get your own copy/clone/fork from <a target=_blank href="https://github.com/Spiritdude/OpenJSCAD.org">GitHub: OpenJSCAD</a>
+PixelPrinter, MIT License, get your own copy/clone/fork from <a target=_blank href="https://github.com/cmchap/PixelPrinter">GitHub: PixelPrinter</a>
 </div>
 
 <script id=conversionWorker type="javascript/worker">
@@ -979,7 +976,7 @@ function parseFile(f, debugging, onlyifchanged) {     // here we convert the fil
   var editorSource = source;
   if(source == "") {
     if(document.location.toString().match(/^file\:\//i)) {
-      throw new Error("Could not read file. You are using a local copy of OpenJSCAD.org; if you are using Chrome, you need to launch it with the following command line option:\n\n--allow-file-access-from-files\n\notherwise the browser will not have access to uploaded files due to security restrictions.");
+      throw new Error("Could not read file. You are using a local copy of PixelPrinter; if you are using Chrome, you need to launch it with the following command line option:\n\n--allow-file-access-from-files\n\notherwise the browser will not have access to uploaded files due to security restrictions.");
     } else {
       throw new Error("Could not read file.");
     }            

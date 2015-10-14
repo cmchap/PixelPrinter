@@ -19,13 +19,11 @@ function eightBit(bitmap, block_size, color_array) {
 	return o;
 }
 
-function convertBitmap(bitmap, zeros, ones, twos, threes, fours, fives, sixes, sevens, eights, nines, tens) {
+function convertBitmap(bitmap, ones, twos, threes, fours, fives, sixes, sevens, eights, nines, tens) {
 	bitmap.forEach(function (row, rowCounter) {
 		row.forEach(function (pixel, columnCounter, arr) {
 			if (pixel !== 0) {
-				if (pixel === 0) {
-					arr[columnCounter] = zeros;
-				} else if (pixel === 1) {
+				if (pixel === 1) {
 					arr[columnCounter] = ones;
 				} else if (pixel === 2) {
 					arr[columnCounter] = twos;
@@ -102,30 +100,25 @@ function getParameterDefinitions() {
 			initial: 0,
 			caption: 'Additional Thickness (mm)'
 		},
-		{
-			name: 'size_of_block',
-			type: 'float',
-			initial: 1,
-			caption: 'Pixel size (mm)'
-		},
-		{
-			name: 'invert',
-			type: 'choice',
-			caption: 'Invert Heights',
-			values: ['NO', 'YES'],
-			captions: ['No','Yes'],
-			initial: 'No'
-		},
+		// {
+		// 	name: 'size_of_block',
+		// 	type: 'float',
+		// 	initial: 1,
+		// 	caption: 'Pixel size (mm)'
+		// },
+		// {
+		// 	name: 'invert',
+		// 	type: 'choice',
+		// 	caption: 'Invert Heights',
+		// 	values: ['NO', 'YES'],
+		// 	captions: ['No','Yes'],
+		// 	initial: 'No'
+		// },
 		{
 			name: 'multiplier',
 			type: 'float',
 			initial: 1,
 			caption: 'Multiplier'
-		},{
-			name: 'zeros',
-			type: 'float',
-			initial: 0,
-			caption: 'Zeros'
 		},{
 			name: 'ones',
 			type: 'float',
@@ -296,22 +289,24 @@ function main(params) {
 			break;
 		case "ONEUP":
 			bitmap = [
-				[0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0],
-				[0,0,0,3,3,1,1,2,2,1,1,3,3,0,0,0],
-				[0,0,3,3,1,1,1,2,2,1,1,1,3,3,0,0],
-				[0,3,3,2,1,1,2,2,2,2,1,1,2,3,3,0],
-				[0,3,1,2,2,2,2,2,2,2,2,2,2,1,3,0],
-				[3,3,1,1,2,2,1,1,1,1,2,2,1,1,3,3],
-				[3,1,1,1,2,1,1,1,1,1,1,2,1,1,1,3],
-				[3,1,1,1,2,1,1,1,1,1,1,2,1,1,1,3],
-				[3,1,1,2,2,1,1,1,1,1,1,2,2,1,1,3],
-				[3,2,2,2,2,2,1,1,1,1,2,2,2,2,2,3],
-				[3,2,2,3,3,3,3,3,3,3,3,3,3,2,2,3],
-				[3,3,3,3,1,1,3,1,1,3,1,1,3,3,3,3],
-				[0,3,3,1,1,1,3,1,1,3,1,1,1,3,3,0],
-				[0,0,3,1,1,1,1,1,1,1,1,1,1,3,0,0],
-				[0,0,3,3,1,1,1,1,1,1,1,1,3,3,0,0],
-				[0,0,0,3,3,3,3,3,3,3,3,3,3,0,0,0]
+				[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,6,6,6,6,6,6,2,2,2,2,2,2],
+				[2,2,2,2,6,6,1,1,5,5,5,5,6,6,2,2,2,2],
+				[2,2,2,6,1,1,1,1,4,4,4,4,1,1,6,2,2,2],
+				[2,2,6,1,1,1,1,3,3,3,3,3,4,1,1,6,2,2],
+				[2,2,6,1,1,1,3,3,1,1,1,1,3,4,1,6,2,2],
+				[2,6,5,4,3,3,3,1,1,1,1,1,1,3,4,5,6,2],
+				[2,6,5,1,1,3,3,1,1,1,1,1,1,3,4,5,6,2],
+				[2,6,1,1,1,1,3,1,1,1,1,1,1,3,4,1,6,2],
+				[2,6,1,1,1,1,4,4,1,1,1,1,4,4,1,1,6,2],
+				[2,6,5,1,1,5,5,5,5,5,5,5,5,5,1,1,6,2],
+				[2,6,5,5,5,6,6,6,6,6,6,6,6,5,5,1,6,2],
+				[2,2,6,6,6,1,1,6,1,1,6,1,1,6,6,6,2,2],
+				[2,2,2,6,1,1,1,6,1,1,6,1,1,1,6,2,2,2],
+				[2,2,2,6,1,1,1,1,1,1,1,1,1,1,6,2,2,2],
+				[2,2,2,2,6,1,1,1,1,1,1,1,1,6,2,2,2,2],
+				[2,2,2,2,2,6,6,6,6,6,6,6,6,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
 			];
 			break;
 		case "QUESTIONMARK":
@@ -382,8 +377,8 @@ function main(params) {
 		bitmap = invertBitmap(bitmap);
 	}
 
-	if (params.multiplier !== 1 || params.zeros !== 0 || params.ones !== 1 || params.twos !== 2 || params.threes !== 3 || params.fours !== 4 || params.fives !== 5 || params.sixes !== 6 || params.sevens !== 7 || params.eights !== 8 || params.nines !== 9 || params.tens !== 10) {
-		bitmap = convertBitmap(bitmap, params.multiplier*params.zeros, params.multiplier*params.ones, params.multiplier*params.twos, params.multiplier*params.threes, params.multiplier*params.fours, params.multiplier*params.fives, params.multiplier*params.sixes, params.multiplier*params.sevens, params.multiplier*params.eights, params.multiplier*params.nines, params.multiplier*params.tens);
+	if (params.multiplier !== 1 || params.ones !== 1 || params.twos !== 2 || params.threes !== 3 || params.fours !== 4 || params.fives !== 5 || params.sixes !== 6 || params.sevens !== 7 || params.eights !== 8 || params.nines !== 9 || params.tens !== 10) {
+		bitmap = convertBitmap(bitmap, params.multiplier*params.ones, params.multiplier*params.twos, params.multiplier*params.threes, params.multiplier*params.fours, params.multiplier*params.fives, params.multiplier*params.sixes, params.multiplier*params.sevens, params.multiplier*params.eights, params.multiplier*params.nines, params.multiplier*params.tens);
 	}
 
 	if (params.thickness !== 0) {
