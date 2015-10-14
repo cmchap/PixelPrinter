@@ -8,6 +8,9 @@ var sourceimage = new Image();
 var canvas = $('#original-canvas');
 var context = canvas[0].getContext('2d');
 
+var canvasoriginalwidth = canvas[0].width;
+var canvasoriginalheight = canvas[0].height;
+
 var hcanvas = document.createElement("canvas");
 var hcontext = hcanvas.getContext("2d");
 
@@ -34,6 +37,12 @@ function resetAll() {
 	context.clearRect(0, 0, canvas[0].width, canvas[0].height);
 	hcontext.clearRect(0,0, hcanvas.width, hcanvas.height);
 	scontext.clearRect(0, 0, scanvas[0].width, scanvas[0].height);
+
+	canvas[0].width = canvasoriginalwidth;
+	canvas[0].height = canvasoriginalheight;
+
+	scanvas[0].width = canvasoriginalwidth;
+	scanvas[0].height = canvasoriginalheight;
 
 	scanvas.hide();
 	$('#create-simplified').hide();

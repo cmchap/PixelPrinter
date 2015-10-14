@@ -27,23 +27,12 @@
 	overflow: scroll;
 }
 
-canvas {
-	border: 1px solid red;
-}
-
 #color-simplifier #original-canvas, #color-simplifier #simplified-canvas {
 	cursor: crosshair;
 	float: left;
 	margin: auto 0.5em;
 
 }
-/*#color-simplifier #original-canvas {
-	float: left;
-}
-*/
-/*#color-simplifier #current-color {
-	margin-bottom: 1em;
-}*/
 
 #color-simplifier button {
 	margin-top: 1em;
