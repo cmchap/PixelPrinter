@@ -107,6 +107,7 @@ function setImageFromFile(thiselement, srcimg, canv, ctx, hcanv, hctx, sel) {
 				canv.width = srcimg.width*ratio;
 				canv.height = srcimg.height*ratio;
 				ctx.imageSmoothingEnabled = false;
+				// drawPattern(canv, ctx);
 				ctx.scale(ratio,ratio);
 				ctx.drawImage(
 					srcimg,
@@ -139,6 +140,7 @@ function setImageFromSelector(srcimg, sel, canv, ctx, hcanv, hctx) {
 			canv.width = srcimg.width*ratio;
 			canv.height = srcimg.height*ratio;
 			ctx.imageSmoothingEnabled = false;
+			// drawPattern(canv, ctx);
 			ctx.scale(ratio,ratio);
 			ctx.drawImage(
 				srcimg,
@@ -189,7 +191,7 @@ function getColorUnderMouse(canv, ctx, ev) {
 	var r = canvasColor[0];
 	var g = canvasColor[1];
 	var b = canvasColor[2];
-	var a = canvasColor[3]/255;
+	var a = Math.round(canvasColor[3]/255);
 
 	return [r,g,b,a];
 }
@@ -265,10 +267,10 @@ function removeSavedColor(clickedelement, colorlist) {
 	listelement.remove();
 }
 
-
 function simplifyColors(hcanv, hctx, scanv, sctx, hscanv, hsctx, svdcolors, srcimg) {
 	sctx.restore();
 	sctx.clearRect(0,0,scanv.width,scanv.height);
+	// drawPattern(scanv, sctx);
 	var ratio = getFittingMultiplier(scanv, hcanv);
 	var imageData = hctx.getImageData(0, 0, hcanv.width, hcanv.height);
 	var data = imageData.data;
@@ -282,13 +284,15 @@ function simplifyColors(hcanv, hctx, scanv, sctx, hscanv, hsctx, svdcolors, srci
 		var rdata = data[value];
 		var gdata = data[value+1];
 		var bdata = data[value+2];
+		var adata = data[value+3];
 
 		for (var color = 0; color < svdcolors.length; color++) {
 			var rsaved = svdcolors[color][0];
 			var gsaved = svdcolors[color][1];
 			var bsaved = svdcolors[color][2];
+			var asaved = svdcolors[color][3];
 
-			if (rdata == rsaved && gdata == gsaved && bdata == gsaved) {
+			if (rdata == rsaved && gdata == gsaved && bdata == gsaved && adata == asaved) {
 				distances.push(0);
 			} 
 			else {
@@ -302,6 +306,7 @@ function simplifyColors(hcanv, hctx, scanv, sctx, hscanv, hsctx, svdcolors, srci
 		}
 		var shortestdistindex = distances.indexOf(Math.min.apply(Math,distances));
 		var shortestavg = (svdcolors[shortestdistindex][0] + svdcolors[shortestdistindex][1] + svdcolors[shortestdistindex][2]) / 3;
+		shortestavg = Math.round(shortestavg);
 		data[value]   = shortestavg;
 		data[value+1] = shortestavg;
 		data[value+2] = shortestavg;
@@ -342,10 +347,10 @@ function generateArray(sdata, gcolors, hscanv) {
 
 	for (var pixel = 0; pixel < sdata.data.length; pixel+=4) {
 		if (sdata.data[pixel+3] === 0) { //"correct" for transparent black pixels
-			sdata.data[pixel] = 255;
-			sdata.data[pixel+1] = 255;
-			sdata.data[pixel+2] = 255;
-			sdata.data[pixel+3] = 255;
+			sdata.data[pixel] = 254;
+			sdata.data[pixel+1] = 254;
+			sdata.data[pixel+2] = 254;
+			sdata.data[pixel+3] = 1;
 		}
 		var value = $.inArray(sdata.data[pixel], sortedcolors)+1; //index plus one in sortedcolors that matches the value of the red pixel in sdata
 		valuearray.push(value);
@@ -373,10 +378,10 @@ function generateArrayOriginal(odata, hcanv) {
 
 	for (var i = 0; i < origdata.length; i += 4) {
 		if (origdata[i+3] === 0) { //"correct" for transparent black pixels
-			origdata[i] = 255;
-			origdata[i+1] = 255;
-			origdata[i+2] = 255;
-			origdata[i+3] = 255;
+			origdata[i] = 254	;
+			origdata[i+1] = 254;
+			origdata[i+2] = 254;
+			origdata[i+3] = 1;
 		}
 		var avg = Math.round((origdata[i] + origdata[i +1] + origdata[i +2]) / 3);
 		origdata[i]     = avg; // red
@@ -447,6 +452,17 @@ canvas.mousemove( function(e) {
 	updateSelectedColor(canvas[0], context, e);
 });
 
+scanvas.mouseenter( function() {
+	currentcolor[0].style.visibility = 'visible';
+});
+scanvas.mouseout( function() {
+	currentcolor[0].style.visibility = 'hidden';
+});
+
+scanvas.mousemove( function(e) {
+	updateSelectedColor(scanvas[0], scontext, e);
+});
+
 canvas.click( function(e) {
 	saveColor(canvas[0], context, savedcolorlist, savedcolors, e);
 });
@@ -467,5 +483,3 @@ $('#create-original').click( function() {
 	$('.parameterstable').next('button:contains("Update")').trigger('click');
 
 });
-
-

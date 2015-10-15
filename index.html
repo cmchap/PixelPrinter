@@ -136,27 +136,22 @@ $(document).ready(function() {
     <option value="testing">Testing</option>
     <option value="rhino">Rhino</option>
   </select>
-  <br>
-  <br>
   <input type='file' id="file-upload" />
-  <br>
-  <br>
   <div id="canvas-div" class="clearfix">
     <canvas id="original-canvas" width="250" height="250"></canvas>
-    <canvas id="simplified-canvas" width="250" height="250"></canvas>
+    <div id="fake-div">
+      <canvas id="simplified-canvas" width="250" height="250"></canvas>
+    </div>
   </div>
-  <br>
-  <div id="current-color">Color Under Cursor: <span id="selected-color" class="color-swatch"></span><span id="current-color-rgba"></span></div>
+  <div id="current-color">
+    <span>Color Under Cursor: </span><span id="selected-color" class="color-swatch"></span><span id="current-color-rgba"></span>
+  </div>
   <button id='simplify-colors-button'>Simplify Colors</button>
-  <br>
   <button id="create-original">Generate Model from Original Image</button>
-  <br>
   <button id="create-simplified">Generate Model from Simplified Image</button>
-  <br>
   <p>Saved Colors:</p>
   <table id="saved-color-list">
   </table>
-  <ol id="color-list"></ol>
 </div>
 <!-- <div id=menu>
 <img id=menuHandle src="imgs/menuHandleVL.png">
