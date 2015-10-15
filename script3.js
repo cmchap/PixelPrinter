@@ -57,6 +57,16 @@ function resetAll() {
 function readSelector(sel) {
 	if (sel.value === 'mushroom') {
 		return 'images/mushroom.png';
+	} else if (sel.value === 'samus') {
+		return 'images/samus.png';
+	} else if (sel.value === 'megaman') {
+		return 'images/megaman.png';
+	} else if (sel.value === 'pokeball') {
+		return 'images/pokeball.png';
+	} else if (sel.value === 'marioicon') {
+		return 'images/marioicon.png';
+	} else if (sel.value === 'egg') {
+		return 'images/egg.png';
 	} else if (sel.value === 'yoshi') {
 		return 'images/yoshi.png';
 	} else if (sel.value === 'pikachu') {
