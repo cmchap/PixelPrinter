@@ -19,11 +19,11 @@
 	position: absolute;
 	z-index: 99999;
 	padding: 1em;
-	margin: 0;
 	top:    0;
 	right:  0;
 	background-color: white;
-	overflow: scroll;
+	overflow: auto;
+	min-width: 18em;
 }
 
 #color-simplifier select,
@@ -50,8 +50,11 @@
 #color-simplifier #original-canvas,
 #color-simplifier #fake-div {
 	display: inline-block;
-	cursor: crosshair;
 	float: left;
+}
+
+#color-simplifier #original-canvas {
+	cursor: crosshair;
 }
 
 #color-simplifier #fake-div:before {
@@ -62,10 +65,12 @@
 	height: 100%;
 	width: 1em;
 	background-color: white;
+	cursor: auto;
 }
 
 #color-simplifier #simplified-canvas {
 	margin-left: 1em;
+	cursor: crosshair;
 }
 
 #color-simplifier #selected-color,
