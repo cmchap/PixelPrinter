@@ -21,26 +21,57 @@
 	padding: 1em;
 	margin: 0;
 	top:    0;
-	bottom: 0;
 	right:  0;
 	background-color: white;
 	overflow: scroll;
 }
 
-#color-simplifier #original-canvas, #color-simplifier #simplified-canvas {
+#color-simplifier select,
+#color-simplifier input,
+#color-simplifier button {
+	clear: both;
+	margin-top: 1em;
+	display: block;
+}
+
+#color-simplifier #file-upload {
+	margin-bottom: 1em;
+}
+
+#color-simplifier #canvas-div {
+	position: relative;
+	display: inline-block;
+	line-height: 0;
+	background:url(
+		data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAKElEQVQYV2N8+PDhfwY0ICcnhy7EwDgUFP7//x/DM48ePcL0zBBQCADYKDUhkuGTogAAAABJRU5ErkJggg==
+    ) repeat;
+}
+
+#color-simplifier #original-canvas,
+#color-simplifier #fake-div {
+	display: inline-block;
 	cursor: crosshair;
 	float: left;
-	margin: auto 0.5em;
-
 }
 
-#color-simplifier button {
-	margin-top: 1em;
-}
-
-#color-simplifier #simplify-colors-button {
+#color-simplifier #fake-div:before {
+	position: absolute;
 	display: inline-block;
-	/*margin-left: 5em;*/
+	content: '';
+	float: left;
+	height: 100%;
+	width: 1em;
+	background-color: white;
+}
+
+#color-simplifier #simplified-canvas {
+	margin-left: 1em;
+}
+
+#color-simplifier #selected-color,
+#color-simplifier #current-color-rgba {
+	clear: both;
+	display: block;
 }
 
 #color-simplifier #saved-color-list {
