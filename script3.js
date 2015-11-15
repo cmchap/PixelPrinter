@@ -432,10 +432,22 @@ function generateArrayOriginal(odata, hcanv) {
 $(window).load( function() {
 	setImageFromSelector(sourceimage, selector, canvas[0], context, hcanvas, hcontext);
 	$('#simplify-colors-button').hide();
-	context.imageSmoothingEnabled = false;
-	hcontext.imageSmoothingEnabled = false;
+	context.mozImageSmoothingEnabled = false;
+ 	context.webkitImageSmoothingEnabled = false;
+ 	context.msImageSmoothingEnabled = false;
+ 	context.imageSmoothingEnabled = false;
+	hcontext.mozImageSmoothingEnabled = false;
+ 	hcontext.webkitImageSmoothingEnabled = false;
+ 	hcontext.msImageSmoothingEnabled = false;
+ 	hcontext.imageSmoothingEnabled = false;
+	scontext.mozImageSmoothingEnabled = false;
+ 	scontext.webkitImageSmoothingEnabled = false;
+ 	scontext.msImageSmoothingEnabled = false;
 	scontext.imageSmoothingEnabled = false;
-	hscontext.imageSmoothingEnabled = false;
+	hscontext.mozImageSmoothingEnabled = false;
+ 	hscontext.webkitImageSmoothingEnabled = false;
+ 	hscontext.msImageSmoothingEnabled = false;
+ 	hscontext.imageSmoothingEnabled = false;
 	scanvas.hide();
 	$('#create-simplified').hide();
 	currentcolor[0].style.visibility = 'hidden';
